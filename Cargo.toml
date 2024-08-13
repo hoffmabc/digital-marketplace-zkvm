@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "src/program",
+]
+
+[package]
+name = "digital-marketplace"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]

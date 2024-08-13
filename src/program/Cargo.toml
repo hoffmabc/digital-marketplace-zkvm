@@ -1,0 +1,13 @@
+[package]
+name = "digital-marketplace-program"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+bitcoin = "0.32.2"
+borsh = "1.5.1"
+sdk = { path = "../../sdk" }  # Adjust this path as needed
+
+[lib]
+crate-type = ["cdylib"]

@@ -4,14 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0"
-bitcoin = "0.30.0"
-borsh = "0.10.0"
+sdk = { path = "../../sdk" }
+anyhow = { version = "1", features = ["backtrace"] }
+borsh = { version = "1.4.0", features = ["derive"] }
+serde = { version = "1.0.198", features = ["derive"] }
+bitcoin = { git = "https://github.com/Arch-Network/bitcoin-arch-v2" }
+risc0-zkvm = { version = "0.21.0" }
 
 [lib]
-name = "digital_marketplace_program"
-path = "src/lib.rs"
-
-[[bin]]
-name = "digital-marketplace-program"
-path = "src/main.rs"
+crate-type = ["cdylib"]

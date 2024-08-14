@@ -10,3 +10,7 @@ edition = "2021"
 
 [dependencies]
 digital-marketplace-program = { path = "src/program" }
+
+[[bin]]
+name = "digital-marketplace"
+path = "src/main.rs"

@@ -5,9 +5,13 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
-bitcoin = "0.32.2"
-borsh = "1.5.1"
-sdk = { path = "../../sdk" }  # Adjust this path as needed
+bitcoin = "0.30.0"
+borsh = "0.10.0"
 
 [lib]
-crate-type = ["cdylib"]
+name = "digital_marketplace_program"
+path = "src/lib.rs"
+
+[[bin]]
+name = "digital-marketplace-program"
+path = "src/main.rs"

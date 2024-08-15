@@ -1,21 +1,27 @@
 [workspace]
-members = ["src/program"]
+members = [
+    "digital-marketplace",
+]
 
 [package]
-name = "digital-marketplace"
+name = "digital-marketplace-zkvm"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+digital-marketplace = { path = "digital-marketplace" }
+
 sdk = { path = "sdk" }
 anyhow = { version = "1", features = ["backtrace"] }
 borsh = { version = "1.4.0", features = ["derive"] }
 serde = { version = "1.0.198", features = ["derive"] }
 serde_json = "1.0.116"
 bitcoin = { git = "https://github.com/Arch-Network/bitcoin-arch-v2" }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
+hex = "0.4.3"
 
 [build-dependencies]
 risc0-build = "0.21.0"
 
-[dev-dependencies]
-#risc0-zkvm = "0.21.0"
+[package.metadata.risc0]
+methods = ["digital-marketplace"]

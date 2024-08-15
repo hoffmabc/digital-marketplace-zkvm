@@ -1,7 +1,6 @@
-use crate::models::{
-    CreateUserParams, Item, ListItemParams, MarketplaceState, PurchaseItemParams, UpdateItemParams,
-    User,
-};
+use crate::models::Item;
+use crate::models::{CreateUserParams, ListItemParams, PurchaseItemParams, UpdateItemParams, User};
+use crate::state::MarketPlaceState;
 use anyhow::Result;
 use sdk::{Pubkey, UtxoInfo};
 
@@ -9,10 +8,10 @@ pub fn create_user(
     params: CreateUserParams,
     signer: &Pubkey,
     utxos: &[UtxoInfo],
-) -> Result<MarketplaceState> {
+) -> Result<MarketPlaceState> {
     let mut state = deserialize_state(utxos)?;
     let new_user = User {
-        id: signer.clone(),
+        id: signer.to_string(),
         name: params.name,
         balance: params.initial_balance,
     };
@@ -24,7 +23,7 @@ pub fn list_item(
     params: ListItemParams,
     signer: &Pubkey,
     utxos: &[UtxoInfo],
-) -> Result<MarketplaceState> {
+) -> Result<MarketPlaceState> {
     let mut state = deserialize_state(utxos)?;
     let new_item = Item {
         id: generate_item_id(),
@@ -42,13 +41,13 @@ pub fn purchase_item(
     params: PurchaseItemParams,
     signer: &Pubkey,
     utxos: &[UtxoInfo],
-) -> Result<MarketplaceState> {
+) -> Result<MarketPlaceState> {
     let mut state = deserialize_state(utxos)?;
     let (buyer_index, seller_index, item_index) = {
         let buyer_index = state
             .users
             .iter()
-            .position(|u| u.id == *signer)
+            .position(|u| u.id == signer.to_string())
             .ok_or_else(|| anyhow::anyhow!("Buyer not found"))?;
         let item_index = state
             .items
@@ -59,21 +58,25 @@ pub fn purchase_item(
         let seller_index = state
             .users
             .iter()
-            .position(|u| u.id == *seller_id)
+            .position(|u| u.id == seller_id.to_string())
             .ok_or_else(|| anyhow::anyhow!("Seller not found"))?;
         (buyer_index, seller_index, item_index)
     };
+
     let (buyer, item) = {
-        let (buyers, items) = state.users.split_at_mut(buyer_index + 1);
+        let (buyers, _items) = state.users.split_at_mut(buyer_index + 1);
         (&mut buyers[buyer_index], &mut state.items[item_index])
     };
+
     if !item.available || buyer.balance < item.price {
         return Err(anyhow::anyhow!("Invalid purchase conditions"));
     }
+
     buyer.balance = buyer.balance.saturating_sub(item.price);
     state.users[seller_index].balance =
         state.users[seller_index].balance.saturating_add(item.price);
     item.available = false;
+
     Ok(state)
 }
 
@@ -81,29 +84,24 @@ pub fn update_item(
     params: UpdateItemParams,
     signer: &Pubkey,
     utxos: &[UtxoInfo],
-) -> Result<MarketplaceState> {
+) -> Result<MarketPlaceState> {
     let mut state = deserialize_state(utxos)?;
     let item = state
         .items
         .iter_mut()
-        .find(|i| i.id == params.item_id)
+        .find(|i| i.id == params.item.id)
         .ok_or_else(|| anyhow::anyhow!("Item not found"))?;
     if item.seller != *signer {
         return Err(anyhow::anyhow!("Only the seller can update the item"));
     }
-    if let Some(new_price) = params.new_price {
-        item.price = new_price;
-    }
-    if let Some(new_description) = params.new_description {
-        item.description = new_description;
-    }
-    if let Some(new_availability) = params.new_availability {
-        item.available = new_availability;
-    }
+    item.name = params.item.name;
+    item.description = params.item.description;
+    item.price = params.item.price;
+    item.available = params.item.available;
     Ok(state)
 }
 
-fn deserialize_state(utxos: &[UtxoInfo]) -> Result<MarketplaceState> {
+fn deserialize_state(_utxos: &[UtxoInfo]) -> Result<MarketPlaceState> {
     // Implement deserialization logic here
     // This should combine the state from all UTXOs into a single MarketplaceState
     unimplemented!("State deserialization not implemented")

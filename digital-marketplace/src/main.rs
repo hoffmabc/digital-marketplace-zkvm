@@ -1,13 +1,13 @@
 #![no_main]
 use anyhow::Result;
 use borsh::{BorshDeserialize, BorshSerialize};
+use digital_marketplace::{models::MarketplaceInstruction, processor, state::MarketPlaceState};
 use sdk::{entrypoint, Pubkey, UtxoInfo};
-mod models;
-mod processor;
-use models::{MarketplaceInstruction, MarketplaceState};
 
+#[cfg(target_os = "zkvm")]
 entrypoint!(handler);
 
+#[cfg(target_os = "zkvm")]
 pub fn handler(
     program_id: &Pubkey,
     utxos: &[UtxoInfo],
@@ -15,8 +15,7 @@ pub fn handler(
 ) -> Result<Vec<u8>> {
     let instruction: MarketplaceInstruction =
         BorshDeserialize::deserialize(&mut &instruction_data[..])?;
-
-    let result: Result<MarketplaceState> = match instruction {
+    let result: Result<MarketPlaceState> = match instruction {
         MarketplaceInstruction::CreateUser(params) => {
             processor::create_user(params, program_id, utxos)
         }
@@ -28,14 +27,11 @@ pub fn handler(
             processor::update_item(params, program_id, utxos)
         }
     };
-
     let updated_state = result?;
     let mut result_data = Vec::new();
     updated_state.serialize(&mut result_data)?;
-
     for utxo in utxos {
         *utxo.data.borrow_mut() = result_data.clone();
     }
-
     Ok(result_data)
 }

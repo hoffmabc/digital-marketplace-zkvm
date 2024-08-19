@@ -7,6 +7,7 @@ members = [
 name = "digital-marketplace-zkvm"
 version = "0.1.0"
 edition = "2021"
+resolver = "2"
 
 [dependencies]
 digital-marketplace = { path = "digital-marketplace" }
@@ -16,8 +17,11 @@ anyhow = { version = "1", features = ["backtrace"] }
 borsh = { version = "1.4.0", features = ["derive"] }
 serde = { version = "1.0.198", features = ["derive"] }
 serde_json = "1.0.116"
-bitcoin = { git = "https://github.com/Arch-Network/bitcoin-arch-v2" }
+bitcoincore-rpc = "0.19.0"
+risc0-zkvm = { version = "0.21.0" }
+bitcoin = { version = "0.32.2", features = ["serde", "rand"] }
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
+
 hex = "0.4.3"
 
 [build-dependencies]

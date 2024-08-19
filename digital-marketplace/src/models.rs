@@ -1,11 +1,12 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use sdk::Pubkey;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
 #[derive(Clone, BorshSerialize, BorshDeserialize, Serialize, Deserialize, Debug)]
 pub struct User {
     pub id: String,
-    pub name: String,
+    pub username: String,
     pub balance: u64,
 }
 
@@ -29,7 +30,7 @@ pub enum MarketplaceInstruction {
 
 #[derive(Clone, BorshSerialize, BorshDeserialize)]
 pub struct CreateUserParams {
-    pub name: String,
+    pub username: String,
     pub initial_balance: u64,
     pub tx_hex: Vec<u8>,
 }

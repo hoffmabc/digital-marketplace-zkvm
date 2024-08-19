@@ -7,6 +7,8 @@ edition = "2021"
 sdk = { path = "../sdk" }
 anyhow = { version = "1", features = ["backtrace"] }
 borsh = { version = "1.4.0", features = ["derive"] }
+borsh-derive = { version = "0.9.3" }
 serde = { version = "1.0.198", features = ["derive"] }
 bitcoin = { git = "https://github.com/Arch-Network/bitcoin-arch-v2" }
 risc0-zkvm = { version = "0.21.0", default-features = false, features = ["std"] }
+rand = "0.8.5"

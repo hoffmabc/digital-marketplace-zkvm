@@ -12,7 +12,7 @@ pub fn create_user(
     let mut state = deserialize_state(utxos)?;
     let new_user = User {
         id: signer.to_string(),
-        name: params.name,
+        username: params.username,
         balance: params.initial_balance,
     };
     state.users.push(new_user);
@@ -101,14 +101,22 @@ pub fn update_item(
     Ok(state)
 }
 
-fn deserialize_state(_utxos: &[UtxoInfo]) -> Result<MarketPlaceState> {
-    // Implement deserialization logic here
-    // This should combine the state from all UTXOs into a single MarketplaceState
-    unimplemented!("State deserialization not implemented")
+pub fn deserialize_state(utxos: &[UtxoInfo]) -> Result<MarketPlaceState> {
+    MarketPlaceState::from_utxos(utxos)
 }
 
 fn generate_item_id() -> String {
-    // Implement a function to generate a unique item ID
-    // This could be a random string, a hash, or an incrementing number
-    unimplemented!("Item ID generation not implemented")
+    use rand::Rng;
+    const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ\
+                            abcdefghijklmnopqrstuvwxyz\
+                            0123456789";
+    const ID_LEN: usize = 16;
+    let mut rng = rand::thread_rng();
+
+    (0..ID_LEN)
+        .map(|_| {
+            let idx = rng.gen_range(0..CHARSET.len());
+            CHARSET[idx] as char
+        })
+        .collect()
 }

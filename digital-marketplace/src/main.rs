@@ -1,6 +1,6 @@
 #![no_main]
 use anyhow::Result;
-use borsh::{BorshDeserialize, BorshSerialize};
+use borsh::BorshDeserialize;
 use digital_marketplace::{models::MarketplaceInstruction, processor, state::MarketPlaceState};
 use sdk::{entrypoint, Pubkey, UtxoInfo};
 
@@ -19,17 +19,23 @@ pub fn handler(
         MarketplaceInstruction::CreateUser(params) => {
             processor::create_user(params, program_id, utxos)
         }
+
         MarketplaceInstruction::ListItem(params) => processor::list_item(params, program_id, utxos),
+
         MarketplaceInstruction::PurchaseItem(params) => {
             processor::purchase_item(params, program_id, utxos)
         }
+
         MarketplaceInstruction::UpdateItem(params) => {
             processor::update_item(params, program_id, utxos)
         }
     };
+
     let updated_state = result?;
-    let mut result_data = Vec::new();
-    updated_state.serialize(&mut result_data)?;
+    let result_data = Vec::new();
+
+    updated_state.serialize()?;
+
     for utxo in utxos {
         *utxo.data.borrow_mut() = result_data.clone();
     }
